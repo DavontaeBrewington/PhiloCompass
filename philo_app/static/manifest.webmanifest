@@ -1,0 +1,17 @@
+{
+  "name": "PhiloCompass",
+  "short_name": "PhiloCompass",
+  "description": "A Socratic compass for thinking — explore the galaxy of philosophy and let a Socratic teacher question your reasoning.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#140a26",
+  "theme_color": "#1a0b2e",
+  "icons": [
+    {
+      "src": "/static/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ]
+}

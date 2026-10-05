@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PhiloCompass — A Socratic Compass for Thinking</title>
+  <meta name="description" content="Explore the galaxy of philosophy. Let a Socratic teacher question your thinking, and trace the lineage of ideas across two thousand years." />
+  <meta name="og:title" content="PhiloCompass — A Socratic Compass for Thinking" />
+  <meta name="og:description" content="A galaxy of 67 thinkers and a genuinely Socratic teacher that reasons with you." />
+  <meta name="og:type" content="website" />
+  <link rel="stylesheet" href="/static/style.css?v=17" />
+  <link rel="manifest" href="/static/manifest.webmanifest" />
+  <link rel="icon" href="/static/favicon.svg" type="image/svg+xml" />
+  <meta name="theme-color" content="#1a0b2e" />
+</head>
+<body>
+  <canvas id="stars"></canvas>
+
+  <!-- Top bar -->
+  <header class="topbar">
+    <div class="brand">
+      <span class="brand-glyph">◈</span>
+      <div class="brand-text">
+        <h1>Philo<span class="gold">Compass</span></h1>
+        <div class="tagline">A Socratic compass for thinking</div>
+      </div>
+    </div>
+    <div class="brand-hero is-hidden" id="brandHero">
+      <h2>Two thousand years of ideas,<br />one <span class="gold">compass</span> to explore them.</h2>
+      <p>Trace how thinkers shaped one another, and let a Socratic teacher question your own reasoning.</p>
+    </div>
+    <nav class="tabs">
+      <button class="tab is-active" data-tab="explore">Explore</button>
+      <button class="tab" data-tab="dialogue">Socratic Dialogue</button>
+    </nav>
+    <button class="icon-btn" id="themeToggle" title="Toggle theme" aria-label="Toggle theme" aria-pressed="false">◐</button>
+  </header>
+
+  <main>
+    <!-- ════════ EXPLORE TAB ════════ -->
+    <section id="tab-explore" class="tab-panel">
+      <div class="explore-head">
+        <input id="mapSearch" class="search-input" type="text" placeholder="Search thinkers & concepts… (e.g. Kant, free will)" />
+        <div class="search-scope">
+          <div class="chips-scroller" id="domainScroller">
+            <div class="domain-ticker-track" id="domainTicker"></div>
+          </div>
+          <div class="map-hint">⋮ drag to pan · scroll to zoom · click a node to inspect it</div>
+        </div>
+      </div>
+      <div class="map-wrap">
+        <div id="mapLoading" class="map-loading">gathering the stars…</div>
+        <div class="map-legend">
+          <span class="legend-item"><span class="dot dot-thinker"></span> Thinker</span>
+          <span class="legend-item"><span class="dot dot-school"></span> School</span>
+          <span class="legend-item"><span class="dot dot-concept"></span> Concept</span>
+          <span class="legend-line"><span class="line-intro"></span> influence</span>
+          <span class="legend-line"><span class="line-related"></span> related</span>
+        </div>
+        <div id="eraRow" class="era-row is-hidden">
+          <span class="era-label" id="eraLabel">All eras</span>
+          <input type="range" id="eraSlider" class="era-slider" min="0" max="100" value="100" />
+          <span class="era-hint">drag to watch the history of philosophy unfold</span>
+        </div>
+        <svg id="constellation" viewBox="-520 -520 1040 1040"></svg>
+      </div>
+    </section>
+
+    <!-- ════════ DIALOGUE TAB ════════ -->
+    <section id="tab-dialogue" class="tab-panel is-hidden">
+      <div class="dialogue-layout">
+        <aside class="dialogue-side">
+          <div class="side-card">
+            <h3>Pick a learning path</h3>
+            <div class="path-pick" id="pathPick"></div>
+            <div class="side-divider">— or a domain —</div>
+            <h3>Pick a domain</h3>
+            <div class="domain-pick" id="domainPick"></div>
+            <button class="btn btn-gold" id="beginBtn">Begin a Dialogue</button>
+            <button class="btn btn-ghost is-hidden" id="newQuestionBtn">🔄 New Question</button>
+            <div class="mode-badge" id="modeBadge"></div>
+          </div>
+          <div class="side-card">
+            <h3>⚖️ Debate mode</h3>
+            <p class="demo-blurb">Put two thinkers head-to-head and weigh in as a judge.</p>
+            <div class="debate-pairs" id="debatePairs"></div>
+            <button class="btn btn-ghost" id="debateBtn">Start a Debate</button>
+            <div class="side-divider">— or build your own —</div>
+            <label class="mini-label" for="debateTopicA">Thinker A</label>
+            <input id="debateTopicA" class="custom-q" placeholder="e.g. Nietzsche" list="debateNodeList" />
+            <label class="mini-label" for="debateTopicB">Thinker B</label>
+            <input id="debateTopicB" class="custom-q" placeholder="e.g. Mill" list="debateNodeList" />
+            <label class="mini-label" for="debateQuestion">Question to debate</label>
+            <textarea id="debateQuestion" rows="2" placeholder="e.g. Is freedom found in self-creation or in the liberty of each person?" class="custom-q"></textarea>
+            <datalist id="debateNodeList"></datalist>
+            <button class="btn btn-ghost" id="customDebateBtn">⚡ Debate them</button>
+          </div>
+          <div class="side-card">
+            <h3>✍️ Ask your own</h3>
+            <p class="demo-blurb">Bring any philosophical question you're chewing on.</p>
+            <textarea id="customQBox" rows="2" placeholder="e.g. Is a hot dog a sandwich?" class="custom-q"></textarea>
+            <button class="btn btn-ghost" id="customQBtn">Ask this</button>
+          </div>
+          <div class="path-progress is-hidden" id="pathProgress">
+            <div class="path-progress-label">Learning path progress</div>
+            <div class="path-step-list" id="pathStepList"></div>
+          </div>
+          <div class="side-hint">
+            Socratic method: philosophy begins in wonder. You'll rarely be told the answer — you'll be drawn toward your own.
+          </div>
+        </aside>
+
+        <div class="dialogue-main">
+          <div class="tutor">
+            <div class="tutor-avatar">◈</div>
+            <div class="tutor-bubble" id="tutorBubble">
+              Welcome. Choose a <strong>learning path</strong> (a guided sequence) or a <strong>domain</strong>, then press <strong>Begin a Dialogue</strong>. I'll pose one question, probe your assumptions, and follow wherever your reasoning leads.
+            </div>
+          </div>
+
+          <div id="transcript" class="transcript"></div>
+
+          <div class="composer is-hidden" id="composer">
+            <textarea id="answerBox" rows="2" placeholder="Respond to the question… (your answer, your doubts, your guesses — raw material for thinking)"></textarea>
+            <div class="composer-buttons">
+              <button class="btn btn-mini" id="teachBtn" title="I don't know this topic yet — teach me the background">📖 Teach me</button>
+              <button class="btn btn-mini" id="rewriteBtn" title="I don't fully get the question — re-word it">🔁 Reword the question</button>
+              <button class="btn btn-mini" id="hintBtn" title="I'm stuck — give me a nudge">🪜 I'm stuck</button>
+              <button class="btn btn-gold" id="sendBtn">Respond</button>
+            </div>
+          </div>
+
+          <div class="conclusion is-hidden" id="conclusion"></div>
+
+          <div class="takeaway is-hidden" id="takeawayWrap">
+            <label class="takeaway-label" for="takeawayBox">Your takeaway — one sentence on where this left you</label>
+            <textarea id="takeawayBox" rows="2" placeholder="e.g. 'I now think consequences matter, but only if they respect the individual…'"></textarea>
+          </div>
+
+          <div class="end-actions is-hidden" id="endActions">
+            <button class="btn btn-gold" id="restartBtn">Try another angle</button>
+            <button class="btn btn-next is-hidden" id="nextStepBtn">Next in path →</button>
+            <button class="btn btn-ghost" id="nextDomainBtn">Switch domain</button>
+          </div>
+
+          <div class="export-row is-hidden" id="exportRow">
+            <button class="btn btn-mini" id="exportCopyBtn">⧉ Copy transcript + takeaway</button>
+            <button class="btn btn-mini" id="exportDownloadBtn">⬇ Download .txt</button>
+            <button class="btn btn-mini" id="exportMdBtn">⬇ Download .md</button>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Node detail panel -->
+  <div id="detailPanel" class="detail-panel">
+    <button class="detail-close" id="detailClose">×</button>
+    <div class="detail-kind" id="detailKind"></div>
+    <h2 id="detailName"></h2>
+    <div class="detail-era" id="detailEra"></div>
+    <p class="detail-blurb" id="detailBlurb"></p>
+    <div class="detail-links">
+      <div class="link-group">
+        <div class="link-label">Influenced by</div>
+        <div class="chips" id="detailInfluencedBy"></div>
+      </div>
+      <div class="link-group">
+        <div class="link-label">Influenced</div>
+        <div class="chips" id="detailInfluences"></div>
+      </div>
+      <div class="link-group">
+        <div class="link-label">Related</div>
+        <div class="chips" id="detailRelated"></div>
+      </div>
+    </div>
+    <button class="btn btn-ghost" id="detailDialogue" style="margin-top:1rem;">Think about this → Dialogue</button>
+  </div>
+
+  <!-- Edge rationale tooltip -->
+  <div id="edgeTooltip" class="edge-tooltip"></div>
+
+  <script src="/static/app.js?v=20"></script>
+</body>
+</html>

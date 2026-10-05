@@ -1,0 +1,24 @@
+# ─── Python ───
+venv/
+.venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+
+# ─── Secrets — NEVER commit these ───
+.env
+*.env.local
+
+# ─── Data ───
+*.db
+*.sqlite
+*.sqlite3
+
+# ─── OS / editor ───
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# ─── Misc ───
+.hypothesis/
